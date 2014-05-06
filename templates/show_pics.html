@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+{% block body %}
+
+{% if session.logged_in %}
+<h2>Event status: {{status}}
+<br>
+<br>
+{% if status is none or status == "success" or status == "abort" %}
+    <title>Create an event</title>
+    <form action="{{ url_for('publish_pics') }}" method=post>
+      <dl>
+        <dt>Event name:
+        <dd><input type=text size=30 name=eventname>
+        <dd><input type=submit name="create" value=Create>
+      </dl>
+    </form>
+{% endif %}
+
+{% if status == "created" %}
+<title>Upload new file</title>
+<form action="{{ url_for('publish_pics') }}" method=post enctype=multipart/form-data>
+  <p><input type="file" name="file" accept="image/*" >
+     <input type=submit name="upload" value=Upload>
+</form>
+{% endif %}
+
+{% if files is not none %}
+    {% for pic in files %}
+        <img src="{{ url_for('uploaded_file', event_id=event_id, filename=pic) }}" width=200>
+    {% endfor %}
+
+    {% if status == "created" %}
+    <form action="{{ url_for('publish_pics') }}" method=post>
+         <input type="submit" name="pub" value="Publish">
+    </form>
+    {% endif %}
+{% endif %}
+
+
+{% if status == "pending" %}
+    {% if agree == 1 %}
+        <p>You have agreed to publish.
+    {% elif agree == 0 %}
+        <p>You have rejected to publish.
+    {% else %}
+        <form action="{{ url_for('publish_pics') }}" method=post>
+            <p>Do you agree to publish this event?
+            <p><input type="submit" name="vote" value="Yes">
+            <input type=submit name="vote" value="No">
+        </form>
+    {% endif %}
+{% endif %}
+
+<form action="{{ url_for('publish_pics') }}" method=post>
+  <dl>
+    <dt>Search event:
+    <dd><input type=text size=30 name=ename>
+    <dd><input type=submit name="search" value=Search>
+  </dl>
+</form>
+
+{% if sfiles is not none %}
+    {% for pic in sfiles %}
+        <img src="{{ url_for('uploaded_file', event_id=s_eid, filename=pic) }}" width=200>
+    {% endfor %}
+{% endif %}
+
+
+{% endif %}
+{% endblock %}
+
